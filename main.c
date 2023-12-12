@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct _node {
     char* name;
@@ -10,22 +11,48 @@ typedef struct _node {
 
 void init_node(Node* node);
 Node* read_from_file(FILE* file);
+void write_to_bin(FILE* file, Node* node);
 char* readline(FILE* file, const char* prompt);
 void dealloc_node(Node* node);
 int valid_id(char id[9]);
 void display_node(Node* node);
+Node* read_from_bin(FILE* file);
 
 int main()
 {
-    FILE* file = fopen("test.txt", "r");
-    for (int i = 0; i < 2; ++i) {
-        Node* node = read_from_file(file);
-        if (node != NULL) {
-            display_node(node);
-            dealloc_node(node);
-        }
-    }
+    Node* node = malloc(sizeof(Node));
+    node->name = strdup("qwer dsn cds ncs djc djs");
+    FILE* file_w = fopen("test.bin", "wb");
+    write_to_bin(file_w, node);
+    fclose(file_w);
+    FILE* file_r = fopen("test.bin", "rb");
+    node = read_from_bin(file_r);
+    fclose(file_r);
     return 0;
+}
+
+Node* read_from_bin(FILE* file)
+{
+    int str_len = 0;
+    fread(&str_len, sizeof(int), 1, file);
+    fprintf(stdout, "%d", str_len);
+    char *tmp = (char*)malloc(str_len + 1), *str = NULL;
+    if (tmp != NULL) {
+        str = tmp;
+    } else {
+        fprintf(stderr, "Ошибка памяти\n");
+        return NULL;
+    }
+    fread(str, sizeof(char), str_len + 1, file);
+    fprintf(stdout, "%s", str);
+    return NULL;
+}
+
+void write_to_bin(FILE* file, Node* node)
+{
+    int str_len = strlen(node->name);
+    fwrite(&str_len, sizeof(int), 1, file);
+    fwrite(node->name, str_len + 1, 1, file);
 }
 
 void init_node(Node* node)
