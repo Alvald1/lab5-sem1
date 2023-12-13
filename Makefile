@@ -6,9 +6,9 @@ REPORT_DIR = report_dir
 LIB_DIR = lib
 EXECUTABLE = bin
 
-OPTIM = -Og
+OPTIM = -O0
 
-LDFLAGS = -lreadline
+LDFLAGS = 
 
 all: compile
 

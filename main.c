@@ -10,117 +10,76 @@ typedef struct _node {
 } Node;
 
 void init_node(Node* node);
+void dealloc_node(Node* node);
+void display_node(Node* node);
 Node* read_from_file(FILE* file);
+int valid_id(char* id);
+int valid_alloc(void** original, void* tmp, Node* node, int mode);
+Node* read_from_bin(FILE* file);
 void write_to_bin(FILE* file, Node* node);
 char* readline(FILE* file, const char* prompt);
-void dealloc_node(Node* node);
-int valid_id(char id[9]);
-void display_node(Node* node);
-Node* read_from_bin(FILE* file);
 
 int main()
 {
-    Node* node = malloc(sizeof(Node));
-    node->name = strdup("qwer dsn cds ncs djc djs");
+    /*node->name = strdup("qwer  djs");
+    node->id = strdup("asdf-1232");
+    node->time = 98;
     FILE* file_w = fopen("test.bin", "wb");
     write_to_bin(file_w, node);
     fclose(file_w);
     FILE* file_r = fopen("test.bin", "rb");
     node = read_from_bin(file_r);
-    fclose(file_r);
-    return 0;
-}
-
-Node* read_from_bin(FILE* file)
-{
-    int str_len = 0;
-    fread(&str_len, sizeof(int), 1, file);
-    fprintf(stdout, "%d", str_len);
-    char *tmp = (char*)malloc(str_len + 1), *str = NULL;
-    if (tmp != NULL) {
-        str = tmp;
-    } else {
-        fprintf(stderr, "Ошибка памяти\n");
-        return NULL;
+    fclose(file_r);*/
+    // FILE* file_r = fopen("test.txt", "r");
+    for (int i = 0; i < 5; ++i) {
+        Node* node = read_from_file(stdin);
+        if (node != NULL) {
+            display_node(node);
+            dealloc_node(node);
+        } else {
+            return 0;
+        }
     }
-    fread(str, sizeof(char), str_len + 1, file);
-    fprintf(stdout, "%s", str);
-    return NULL;
-}
-
-void write_to_bin(FILE* file, Node* node)
-{
-    int str_len = strlen(node->name);
-    fwrite(&str_len, sizeof(int), 1, file);
-    fwrite(node->name, str_len + 1, 1, file);
-}
-
-void init_node(Node* node)
-{
-    node->name = NULL;
-    node->id = NULL;
-    node->time = 0;
-}
-void display_node(Node* node)
-{
-    printf("Name: %s\nID: %s\nTime: %d\n", node->name, node->id, node->time);
+    return 0;
 }
 
 Node* read_from_file(FILE* file)
 {
-    Node* node = (Node*)malloc(sizeof(Node));
+    Node* node = NULL;
+    char *prompt_name = "", *prompt_id = "", *prompt_time = "";
+    void* tmp = malloc(sizeof(Node));
+    if (valid_alloc((void*)&node, tmp, NULL, 1) == 0) {
+        return NULL;
+    }
     init_node(node);
-    char *prompt_name = "", *prompt_id = "", *prompt_time = "", *tmp = NULL, *id = NULL;
     if (file == stdin) {
         prompt_name = "Введите ФИО: ";
         prompt_id = "Введите ID: ";
         prompt_time = "Введите время: ";
     }
-    char* str = readline(file, prompt_name);
-    if (str != NULL) {
-        node->name = str;
-    } else {
-        dealloc_node(node);
+    tmp = readline(file, prompt_name);
+    if (valid_alloc((void*)&(node->name), tmp, node, 0) == 0) {
         return NULL;
     }
-    int id_len = 9;
-    tmp = (char*)malloc(id_len);
-    if (tmp != NULL) {
-        id = tmp;
-    } else {
-        fprintf(stderr, "Ошибка памяти\n");
-        dealloc_node(node);
+    tmp = readline(file, prompt_id);
+    if (valid_alloc((void*)&(node->id), tmp, node, 0) == 0) {
         return NULL;
     }
-    fprintf(stdout, "%s", prompt_id);
-    if (fscanf(file, "%9[^\n]", id) != EOF) {
-        int flag = valid_id(id);
-        if (flag) {
-            node->id = id;
-        } else {
-            fprintf(stderr, "Ошибка ввода ID\n");
-            tmp = calloc(1, 1);
-            if (tmp != NULL) {
-                node->id = tmp;
-            } else {
-                fprintf(stderr, "Ошибка памяти\n");
-                dealloc_node(node);
-                return NULL;
-            }
+    if (valid_id(node->id) == 0) {
+        fprintf(stderr, "Ошибка ввода ID\n");
+        free(node->id);
+        tmp = calloc(1, 1);
+        if (valid_alloc((void*)&(node->id), tmp, node, 1) == 0) {
+            return NULL;
         }
-    } else {
-        free(id);
-        dealloc_node(node);
-        return NULL;
     }
-    int time = 0;
-    fprintf(stdout, prompt_time);
-    if (fscanf(file, "%d", &time) != EOF) {
-        if (time > 0) {
-            node->time = time;
-        } else {
+    fprintf(stdout, "%s", prompt_time);
+    if (fscanf(file, "%d", &(node->time)) != EOF) {
+        if (node->time <= 0) {
+            node->time = 0;
             fprintf(stderr, "Ошибка ввода time\n");
             fscanf(file, "%*[^\n]");
+            fscanf(file, "%*c");
         }
     } else {
         dealloc_node(node);
@@ -129,8 +88,11 @@ Node* read_from_file(FILE* file)
     return node;
 }
 
-int valid_id(char id[9])
+int valid_id(char* id)
 {
+    if (strlen(id) != 9) {
+        return 0;
+    }
     int flag = (id[4] == '-');
     for (int i = 0; i < 4; ++i) {
         if (isalpha(id[i])) {
@@ -145,10 +107,79 @@ int valid_id(char id[9])
     return flag == 9;
 }
 
+int valid_alloc(void** original, void* tmp, Node* node, int mode)
+{
+    if (tmp != NULL) {
+        *original = tmp;
+        return 1;
+    }
+    dealloc_node(node);
+    if (mode) {
+        fprintf(stderr, "Ошибка памяти\n");
+    }
+    return 0;
+}
+
+void display_node(Node* node)
+{
+    printf("Name: %s\nID: %s\nTime: %d\n", node->name, node->id, node->time);
+}
+
+void init_node(Node* node)
+{
+    node->name = NULL;
+    node->id = NULL;
+    node->time = 0;
+}
+
+void dealloc_node(Node* node)
+{
+    if (node != NULL) {
+        free(node->name);
+        free(node->id);
+        free(node);
+    }
+}
+
+Node* read_from_bin(FILE* file)
+{
+    Node* node = NULL;
+    int str_len = 0;
+    void* tmp = malloc(sizeof(Node));
+    if (valid_alloc((void*)&node, tmp, NULL, 1) == 0) {
+        return NULL;
+    }
+    init_node(node);
+    fread(&str_len, sizeof(int), 1, file);
+    tmp = malloc(str_len + 1);
+    if (valid_alloc((void*)&(node->name), tmp, node, 1) == 0) {
+        return NULL;
+    }
+    fread(node->name, sizeof(char), str_len + 1, file);
+    fread(&str_len, sizeof(int), 1, file);
+    tmp = malloc(str_len + 1);
+    if (valid_alloc((void*)&(node->id), tmp, node, 1) == 0) {
+        return NULL;
+    }
+    fread(node->id, sizeof(char), str_len + 1, file);
+    fread(&(node->time), sizeof(int), 1, file);
+    return node;
+}
+
+void write_to_bin(FILE* file, Node* node)
+{
+    int str_len = strlen(node->name);
+    fwrite(&str_len, sizeof(int), 1, file);
+    fwrite(node->name, str_len + 1, 1, file);
+    str_len = strlen(node->id);
+    fwrite(&str_len, sizeof(int), 1, file);
+    fwrite(node->id, sizeof(char), str_len + 1, file);
+    fwrite(&(node->time), sizeof(int), 1, file);
+}
+
 char* readline(FILE* file, const char* prompt)
 {
     fprintf(stdout, "%s", prompt);
-    fscanf(file, "%*[\n]");
     int size_inc = 10;
     int len = 0, cnt, max_len = size_inc + 1;
     char* new_buffer = NULL;
@@ -184,11 +215,4 @@ char* readline(FILE* file, const char* prompt)
     }
     fscanf(file, "%*c");
     return buffer;
-}
-
-void dealloc_node(Node* node)
-{
-    free(node->name);
-    free(node->id);
-    free(node);
 }
