@@ -1,6 +1,6 @@
 #include "sort.h"
 
-void gnome_sort(Node** arr, int n, COMPARE compare, int flag)
+void gnome_sort(Node** arr, int n, fptr_compare compare, int flag)
 {
     int index = 0;
     while (index < n) {
@@ -15,7 +15,7 @@ void gnome_sort(Node** arr, int n, COMPARE compare, int flag)
     }
 }
 
-void insertion_sort(Node** arr, int n, COMPARE compare, int flag)
+void insertion_sort(Node** arr, int n, fptr_compare compare, int flag)
 {
     int i, j;
     Node* key;
@@ -30,7 +30,7 @@ void insertion_sort(Node** arr, int n, COMPARE compare, int flag)
     }
 }
 
-void _qsort(Node** arr, int left, int right, COMPARE compare, int flag)
+void _qsort(Node** arr, int left, int right, fptr_compare compare, int flag)
 {
     int i, last;
     if (left >= right)

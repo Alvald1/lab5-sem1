@@ -7,31 +7,17 @@
 
 int main()
 {
-    /*node->name = strdup("qwer  djs");
-    node->id = strdup("asdf-1232");
-    node->time = 98;
-    FILE* file_w = fopen("test.bin", "wb");
-    write_to_bin(file_w, node);
-    fclose(file_w);
     FILE* file_r = fopen("test.bin", "rb");
-    node = read_from_bin(file_r);
-    fclose(file_r);*/
-    FILE* file_r = fopen("test.txt", "r");
     int cnt = 0;
     Node** nodes = NULL;
-    if ((cnt = read_from_file(file_r, &nodes)) == 0) {
+    if ((cnt = read(stdin, &nodes, FILE_MODE)) == 0) {
         return 0;
     }
-    write_to_file(stdout, nodes, cnt);
-    printf("\n\n");
-    insertion_sort(nodes, cnt, cmp_name, DIRECT);
-    write_to_file(stdout, nodes, cnt);
-    printf("\n\n");
-    gnome_sort(nodes, cnt, cmp_id, REVERSE);
-    write_to_file(stdout, nodes, cnt);
-    printf("\n\n");
-    _qsort(nodes, 0, cnt - 1, cmp_time, 0);
-    write_to_file(stdout, nodes, cnt);
+    FILE* file_w = fopen("test.txt", "w");
+    write(file_w, nodes, cnt, FILE_MODE);
+    write(stdout, nodes, cnt, FILE_MODE);
+    fclose(file_w);
+    fclose(file_r);
     dealloc_nodes(nodes, cnt);
     return 0;
 }

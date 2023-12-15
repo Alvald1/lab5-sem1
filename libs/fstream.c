@@ -1,16 +1,28 @@
 #include "fstream.h"
 
-int read_from_file(FILE* file, Node*** nodes)
+int read(FILE* file, Node*** nodes, int mode)
 {
     int cnt = 0;
-    fscanf(file, "%d", &cnt);
-    fscanf(file, "%*c");
+    fptr_read_mode read_mode = NULL;
+    if (mode == BIN_MODE) {
+        fread(&cnt, sizeof(int), 1, file);
+        read_mode = read_node_from_bin;
+    } else if (mode == FILE_MODE) {
+        if (file == stdin) {
+            fprintf(stdout, "Количетво структур: ");
+        }
+        if (fscanf(file, "%d", &cnt) == EOF) {
+            return 0;
+        }
+        fscanf(file, "%*c");
+        read_mode = read_node_from_file;
+    }
     void* tmp = malloc(cnt * sizeof(Node*));
     if (valid_alloc((void*)nodes, tmp, NULL, 1) == 0) {
         return 0;
     }
     for (int i = 0; i < cnt; ++i) {
-        tmp = read_node_from_file(file);
+        tmp = (*read_mode)(file);
         if (tmp != NULL) {
             (*(*nodes + i)) = tmp;
         } else {
@@ -19,6 +31,23 @@ int read_from_file(FILE* file, Node*** nodes)
         }
     }
     return cnt;
+}
+
+void write(FILE* file, Node** nodes, int cnt, int mode)
+{
+    fptr_write_mode write_mode = NULL;
+    if (mode == BIN_MODE) {
+        fwrite(&cnt, sizeof(int), 1, file);
+        write_mode = write_node_to_bin;
+    } else if (mode == FILE_MODE) {
+        if (file != stdout) {
+            fprintf(file, "%d\n", cnt);
+        }
+        write_mode = write_node_to_file;
+    }
+    for (int i = 0; i < cnt; ++i) {
+        (*write_mode)(file, *(nodes + i));
+    }
 }
 
 Node* read_node_from_file(FILE* file)
@@ -66,16 +95,6 @@ Node* read_node_from_file(FILE* file)
     return node;
 }
 
-void write_to_file(FILE* file, Node** nodes, int cnt)
-{
-    if (file != stdout) {
-        fprintf(file, "%d\n", cnt);
-    }
-    for (int i = 0; i < cnt; ++i) {
-        write_node_to_file(file, *(nodes + i));
-    }
-}
-
 void write_node_to_file(FILE* file, Node* node)
 {
     char *prompt_name = "", *prompt_id = "", *prompt_time = "";
@@ -85,38 +104,6 @@ void write_node_to_file(FILE* file, Node* node)
         prompt_time = "Time: ";
     }
     fprintf(file, "%s%s\n%s%s\n%s%d\n", prompt_name, node->name, prompt_id, node->id, prompt_time, node->time);
-}
-
-int valid_id(char* id)
-{
-    if (strlen(id) != 9) {
-        return 0;
-    }
-    int flag = (id[4] == '-');
-    for (int i = 0; i < 4; ++i) {
-        if (isalpha(id[i])) {
-            ++flag;
-        }
-    }
-    for (int i = 5; i < 9; ++i) {
-        if (isdigit(id[i])) {
-            ++flag;
-        }
-    }
-    return flag == 9;
-}
-
-int valid_alloc(void** original, void* tmp, Node* node, int mode)
-{
-    if (tmp != NULL) {
-        *original = tmp;
-        return 1;
-    }
-    dealloc_node(node);
-    if (mode) {
-        fprintf(stderr, "Ошибка памяти\n");
-    }
-    return 0;
 }
 
 Node* read_node_from_bin(FILE* file)
@@ -153,4 +140,36 @@ void write_node_to_bin(FILE* file, Node* node)
     fwrite(&str_len, sizeof(int), 1, file);
     fwrite(node->id, sizeof(char), str_len + 1, file);
     fwrite(&(node->time), sizeof(int), 1, file);
+}
+
+int valid_id(char* id)
+{
+    if (strlen(id) != 9) {
+        return 0;
+    }
+    int flag = (id[4] == '-');
+    for (int i = 0; i < 4; ++i) {
+        if (isalpha(id[i])) {
+            ++flag;
+        }
+    }
+    for (int i = 5; i < 9; ++i) {
+        if (isdigit(id[i])) {
+            ++flag;
+        }
+    }
+    return flag == 9;
+}
+
+int valid_alloc(void** original, void* tmp, Node* node, int mode)
+{
+    if (tmp != NULL) {
+        *original = tmp;
+        return 1;
+    }
+    dealloc_node(node);
+    if (mode) {
+        fprintf(stderr, "Ошибка памяти\n");
+    }
+    return 0;
 }
