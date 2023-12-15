@@ -1,13 +1,14 @@
+#include <limits.h>
 #include <stdio.h>
 
 #include "libs/fstream.h"
-#include "libs/readline.h"
+#include "libs/gen.h"
 #include "libs/sort.h"
 #include "libs/struct.h"
 
 int main()
 {
-    FILE* file_r = fopen("test.bin", "rb");
+    /*FILE* file_r = fopen("test.bin", "rb");
     int cnt = 0;
     Node** nodes = NULL;
     if ((cnt = read(stdin, &nodes, FILE_MODE)) == 0) {
@@ -18,6 +19,7 @@ int main()
     write(stdout, nodes, cnt, FILE_MODE);
     fclose(file_w);
     fclose(file_r);
-    dealloc_nodes(nodes, cnt);
+    dealloc_nodes(nodes, cnt);*/
+    gen_arrays_nodes(2, 3);
     return 0;
 }
