@@ -6,11 +6,12 @@ int gen_arrays_nodes(int cnt, int len)
     const int size = 10;
     char str[size], *file_name = NULL;
     for (int i = 0; i < cnt; ++i) {
-        void* tmp = calloc(size + 4 + 1, 1);
+        void* tmp = calloc(size + strlen(".txt") + strlen("test_") + 1, 1);
         if (valid_alloc((void*)&file_name, tmp, NULL, 1) == 0) {
             return 0;
         }
         snprintf(str, sizeof(str), "%d", i);
+        strcat(file_name, "test_");
         strcat(file_name, str);
         strcat(file_name, ".txt");
         Node** nodes = NULL;
