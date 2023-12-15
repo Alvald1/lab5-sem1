@@ -9,15 +9,26 @@ typedef struct _node {
     int time;
 } Node;
 
+typedef int (*COMPARE)(Node* node_1, Node* node_2);
+
 void init_node(Node* node);
+void dealloc_nodes(Node** nodes, int cnt);
 void dealloc_node(Node* node);
-void display_node(Node* node);
-Node* read_from_file(FILE* file);
+int read_from_file(FILE* file, Node*** nodes);
+Node* read_node_from_file(FILE* file);
+void write_node_to_file(FILE* file, Node* node);
 int valid_id(char* id);
 int valid_alloc(void** original, void* tmp, Node* node, int mode);
-Node* read_from_bin(FILE* file);
-void write_to_bin(FILE* file, Node* node);
+Node* read_node_from_bin(FILE* file);
+void write_node_to_bin(FILE* file, Node* node);
 char* readline(FILE* file, const char* prompt);
+void swap(Node** node_1, Node** node_2);
+void gnome_sort(Node** arr, int n, COMPARE compare, int flag);
+void insertion_sort(Node** arr, int n, COMPARE compare, int flag);
+void _qsort(Node** arr, int left, int right, COMPARE compare, int flag);
+int cmp_name(Node* node_1, Node* node_2);
+int cmp_id(Node* node_1, Node* node_2);
+int cmp_time(Node* node_1, Node* node_2);
 
 int main()
 {
@@ -30,20 +41,41 @@ int main()
     FILE* file_r = fopen("test.bin", "rb");
     node = read_from_bin(file_r);
     fclose(file_r);*/
-    // FILE* file_r = fopen("test.txt", "r");
-    for (int i = 0; i < 5; ++i) {
-        Node* node = read_from_file(stdin);
-        if (node != NULL) {
-            display_node(node);
-            dealloc_node(node);
-        } else {
-            return 0;
-        }
+    FILE* file_r = fopen("test.txt", "r");
+    int cnt = 0;
+    Node** nodes = NULL;
+    if ((cnt = read_from_file(file_r, &nodes)) == 0) {
+        return 0;
     }
+    for (int i = 0; i < cnt; ++i) {
+        write_node_to_file(stdout, *(nodes + i));
+    }
+    dealloc_nodes(nodes, cnt);
     return 0;
 }
 
-Node* read_from_file(FILE* file)
+int read_from_file(FILE* file, Node*** nodes)
+{
+    int cnt = 0;
+    fscanf(file, "%d", &cnt);
+    fscanf(file, "%*c");
+    void* tmp = malloc(cnt * sizeof(Node*));
+    if (valid_alloc((void*)nodes, tmp, NULL, 1) == 0) {
+        return 0;
+    }
+    for (int i = 0; i < cnt; ++i) {
+        tmp = read_node_from_file(file);
+        if (tmp != NULL) {
+            (*(*nodes + i)) = tmp;
+        } else {
+            dealloc_nodes(*nodes, i - 1);
+            return 0;
+        }
+    }
+    return cnt;
+}
+
+Node* read_node_from_file(FILE* file)
 {
     Node* node = NULL;
     char *prompt_name = "", *prompt_id = "", *prompt_time = "";
@@ -79,13 +111,24 @@ Node* read_from_file(FILE* file)
             node->time = 0;
             fprintf(stderr, "Ошибка ввода time\n");
             fscanf(file, "%*[^\n]");
-            fscanf(file, "%*c");
         }
+        fscanf(file, "%*c");
     } else {
         dealloc_node(node);
         return NULL;
     }
     return node;
+}
+
+void write_node_to_file(FILE* file, Node* node)
+{
+    char *prompt_name = "", *prompt_id = "", *prompt_time = "";
+    if (file == stdout) {
+        prompt_name = "Name: ";
+        prompt_id = "ID: ";
+        prompt_time = "Time: ";
+    }
+    fprintf(file, "%s%s\n%s%s\n%s%d\n", prompt_name, node->name, prompt_id, node->id, prompt_time, node->time);
 }
 
 int valid_id(char* id)
@@ -120,16 +163,19 @@ int valid_alloc(void** original, void* tmp, Node* node, int mode)
     return 0;
 }
 
-void display_node(Node* node)
-{
-    printf("Name: %s\nID: %s\nTime: %d\n", node->name, node->id, node->time);
-}
-
 void init_node(Node* node)
 {
     node->name = NULL;
     node->id = NULL;
     node->time = 0;
+}
+
+void dealloc_nodes(Node** nodes, int cnt)
+{
+    for (int i = 0; i < cnt; ++i) {
+        dealloc_node(*(nodes + i));
+    }
+    free(nodes);
 }
 
 void dealloc_node(Node* node)
@@ -141,7 +187,7 @@ void dealloc_node(Node* node)
     }
 }
 
-Node* read_from_bin(FILE* file)
+Node* read_node_from_bin(FILE* file)
 {
     Node* node = NULL;
     int str_len = 0;
@@ -166,7 +212,7 @@ Node* read_from_bin(FILE* file)
     return node;
 }
 
-void write_to_bin(FILE* file, Node* node)
+void write_node_to_bin(FILE* file, Node* node)
 {
     int str_len = strlen(node->name);
     fwrite(&str_len, sizeof(int), 1, file);
@@ -215,4 +261,78 @@ char* readline(FILE* file, const char* prompt)
     }
     fscanf(file, "%*c");
     return buffer;
+}
+
+void gnome_sort(Node** arr, int n, COMPARE compare, int flag)
+{
+    int index = 0;
+    while (index < n) {
+        if (index == 0)
+            index++;
+        if (((*compare)(*(arr + index), *(arr + index - 1)) > 0) ^ flag)
+            index++;
+        else {
+            swap((arr + index), (arr + index - 1));
+            index--;
+        }
+    }
+}
+
+void insertion_sort(Node** arr, int n, COMPARE compare, int flag)
+{
+    int i, j;
+    Node* key;
+    for (i = 1; i < n; i++) {
+        key = *(arr + i);
+        j = i - 1;
+        while (j >= 0 && (((*compare)(*(arr + j), key)) > 0) ^ flag) {
+            *(arr + j + 1) = *(arr + j);
+            j = j - 1;
+        }
+        *(arr + j + 1) = key;
+    }
+}
+
+void _qsort(Node** arr, int left, int right, COMPARE compare, int flag)
+{
+    int i, last;
+    if (left >= right)
+        return;
+    swap(arr + left, arr + (left + right) / 2);
+    last = left;
+    for (i = left + 1; i <= right; i++)
+        if (((*compare)(arr[i], arr[left]) < 0) ^ flag)
+            swap(arr + ++last, arr + i);
+    swap(arr + left, arr + last);
+    _qsort(arr, left, last - 1, compare, flag);
+    _qsort(arr, last + 1, right, compare, flag);
+}
+
+int cmp_name(Node* node_1, Node* node_2)
+{
+    return strcmp(node_1->name, node_2->name);
+}
+
+int cmp_id(Node* node_1, Node* node_2)
+{
+    return strcmp(node_1->id, node_2->id);
+}
+
+int cmp_time(Node* node_1, Node* node_2)
+{
+    if (node_1->time > node_2->time) {
+        return 1;
+    } else if (node_1->time < node_2->time) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+void swap(Node** node_1, Node** node_2)
+{
+    Node* temp;
+    temp = *node_1;
+    *node_1 = *node_2;
+    *node_2 = temp;
 }
