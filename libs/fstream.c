@@ -66,6 +66,16 @@ Node* read_node_from_file(FILE* file)
     return node;
 }
 
+void write_to_file(FILE* file, Node** nodes, int cnt)
+{
+    if (file != stdout) {
+        fprintf(file, "%d\n", cnt);
+    }
+    for (int i = 0; i < cnt; ++i) {
+        write_node_to_file(file, *(nodes + i));
+    }
+}
+
 void write_node_to_file(FILE* file, Node* node)
 {
     char *prompt_name = "", *prompt_id = "", *prompt_time = "";

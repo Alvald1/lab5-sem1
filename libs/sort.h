@@ -5,6 +5,9 @@
 
 #include "struct.h"
 
+enum { DIRECT,
+    REVERSE };
+
 typedef int (*COMPARE)(Node* node_1, Node* node_2);
 
 void swap(Node** node_1, Node** node_2);

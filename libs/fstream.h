@@ -10,6 +10,7 @@
 
 int read_from_file(FILE* file, Node*** nodes);
 Node* read_node_from_file(FILE* file);
+void write_to_file(FILE* file, Node** nodes, int cnt);
 void write_node_to_file(FILE* file, Node* node);
 int valid_id(char* id);
 int valid_alloc(void** original, void* tmp, Node* node, int mode);

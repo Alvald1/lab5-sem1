@@ -22,24 +22,16 @@ int main()
     if ((cnt = read_from_file(file_r, &nodes)) == 0) {
         return 0;
     }
-    for (int i = 0; i < cnt; ++i) {
-        write_node_to_file(stdout, *(nodes + i));
-    }
+    write_to_file(stdout, nodes, cnt);
     printf("\n\n");
-    _qsort(nodes, 0, cnt - 1, cmp_name, 1);
-    for (int i = 0; i < cnt; ++i) {
-        write_node_to_file(stdout, *(nodes + i));
-    }
+    insertion_sort(nodes, cnt, cmp_name, DIRECT);
+    write_to_file(stdout, nodes, cnt);
     printf("\n\n");
-    _qsort(nodes, 0, cnt - 1, cmp_id, 1);
-    for (int i = 0; i < cnt; ++i) {
-        write_node_to_file(stdout, *(nodes + i));
-    }
+    gnome_sort(nodes, cnt, cmp_id, REVERSE);
+    write_to_file(stdout, nodes, cnt);
     printf("\n\n");
-    _qsort(nodes, 0, cnt - 1, cmp_time, 1);
-    for (int i = 0; i < cnt; ++i) {
-        write_node_to_file(stdout, *(nodes + i));
-    }
+    _qsort(nodes, 0, cnt - 1, cmp_time, 0);
+    write_to_file(stdout, nodes, cnt);
     dealloc_nodes(nodes, cnt);
     return 0;
 }
