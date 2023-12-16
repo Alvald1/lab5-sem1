@@ -179,6 +179,8 @@ int main()
                                     break;
                                 }
                                 gen_arrays_nodes(&time, cnt, len, sort, cmp, dir);
+                                cnt = 0;
+                                len = 0;
                                 printf("avg time: %f\n", time);
                             } else {
                                 return 0;
