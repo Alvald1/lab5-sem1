@@ -1,5 +1,6 @@
 #include <limits.h>
 #include <stdio.h>
+#include <time.h>
 
 #include "libs/fstream.h"
 #include "libs/gen.h"
@@ -20,6 +21,10 @@ int main()
     fclose(file_w);
     fclose(file_r);
     dealloc_nodes(nodes, cnt);*/
-    gen_arrays_nodes(2, 3);
+
+    /*float time = 0;
+    int cnt = 2, len = 100000;
+    gen_arrays_nodes(&time, cnt, len, QSORT_MODE, NAME_MODE, REVERSE);
+    printf("%f", time);*/
     return 0;
 }

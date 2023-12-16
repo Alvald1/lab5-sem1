@@ -1,21 +1,80 @@
 #include "gen.h"
 
-int gen_arrays_nodes(int cnt, int len)
+int measuring_time(Node** nodes, int len, float* time, int sort_mode, int cmp_mode, int direction_mode)
+{
+    int direction = 0;
+    clock_t start = 0, end = 0;
+    fptr_compare compare = NULL;
+    *time = 0;
+    switch (cmp_mode) {
+    case NAME_MODE:
+        compare = cmp_name;
+        break;
+    case ID_MODE:
+        compare = cmp_id;
+        break;
+    case TIME_MODE:
+        compare = cmp_time;
+        break;
+    default:
+        dealloc_nodes(nodes, len);
+        return 0;
+    }
+    switch (direction_mode) {
+    case DIRECT:
+        direction = DIRECT;
+        break;
+    case REVERSE:
+        direction = REVERSE;
+        break;
+    default:
+        dealloc_nodes(nodes, len);
+        return 0;
+    }
+    switch (sort_mode) {
+    case QSORT_MODE:
+        start = clock();
+        _qsort(nodes, 0, len - 1, compare, direction);
+        end = clock();
+        *time += (float)(end - start) / CLOCKS_PER_SEC;
+        break;
+    case GNOME_MODE:
+        start = clock();
+        gnome_sort(nodes, len, compare, direction);
+        end = clock();
+        *time += (float)(end - start) / CLOCKS_PER_SEC;
+        break;
+    case INSERTION_MODE:
+        start = clock();
+        insertion_sort(nodes, len, compare, direction);
+        end = clock();
+        *time += (float)(end - start) / CLOCKS_PER_SEC;
+        break;
+    default:
+        dealloc_nodes(nodes, len);
+        return 0;
+    }
+    return 1;
+}
+
+int gen_arrays_nodes(float* time, int cnt, int len, int sort_mode, int cmp_mode, int direction_mode)
 {
     FILE* file_save = NULL;
     const int size = 10;
-    char str[size], *file_name = NULL;
+    char* file_name = NULL;
+    *time = 0;
     for (int i = 0; i < cnt; ++i) {
         void* tmp = calloc(size + strlen(".txt") + strlen("test_") + 1, 1);
         if (valid_alloc((void*)&file_name, tmp, NULL, 1) == 0) {
             return 0;
         }
-        snprintf(str, sizeof(str), "%d", i);
-        strcat(file_name, "test_");
-        strcat(file_name, str);
-        strcat(file_name, ".txt");
+        sprintf(file_name, "%s%d%s", "test_", i, ".txt");
         Node** nodes = NULL;
         if (gen_nodes(&nodes, len) == 0) {
+            free(file_name);
+            return 0;
+        }
+        if (measuring_time(nodes, len, time, sort_mode, cmp_mode, direction_mode) == 0) {
             free(file_name);
             return 0;
         }
@@ -25,6 +84,7 @@ int gen_arrays_nodes(int cnt, int len)
         fclose(file_save);
         free(file_name);
     }
+    *time /= cnt;
     return 1;
 }
 
