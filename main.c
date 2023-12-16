@@ -43,6 +43,10 @@ int main()
                     file_name = readline(stdin, "Введите название файла\n");
                     file = fopen(file_name, "r");
                     free(file_name);
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
                     if ((len = read(file, &nodes, FILE_MODE)) == 0) {
                         return 0;
                     }
@@ -50,6 +54,10 @@ int main()
                 case 'c':
                     file_name = readline(stdin, "Введите название файла\n");
                     file = fopen(file_name, "rb");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
                     free(file_name);
                     if ((len = read(file, &nodes, BIN_MODE)) == 0) {
                         return 0;
@@ -71,12 +79,20 @@ int main()
                 case 'b':
                     file_name = readline(stdin, "Введите название файла\n");
                     file = fopen(file_name, "w");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
                     free(file_name);
                     write(file, nodes, len, FILE_MODE);
                     break;
                 case 'c':
                     file_name = readline(stdin, "Введите название файла\n");
                     file = fopen(file_name, "wb");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
                     free(file_name);
                     write(file, nodes, len, BIN_MODE);
                     break;
@@ -178,7 +194,9 @@ int main()
                                     sort = INSERTION_MODE;
                                     break;
                                 }
-                                gen_arrays_nodes(&time, cnt, len, sort, cmp, dir);
+                                if (gen_arrays_nodes(&time, cnt, len, sort, cmp, dir) == 0) {
+                                    return 0;
+                                }
                                 cnt = 0;
                                 len = 0;
                                 printf("avg time: %f\n", time);

@@ -79,6 +79,11 @@ int gen_arrays_nodes(float* time, int cnt, int len, int sort_mode, int cmp_mode,
             return 0;
         }
         file_save = fopen(file_name, "w");
+        if (file_save == NULL) {
+            fprintf(stderr, "Ошибка файла\n");
+            dealloc_nodes(nodes, len);
+            return 0;
+        }
         write(file_save, nodes, len, FILE_MODE);
         dealloc_nodes(nodes, len);
         fclose(file_save);
