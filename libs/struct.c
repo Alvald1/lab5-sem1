@@ -9,6 +9,9 @@ void init_node(Node* node)
 
 void dealloc_nodes(Node** nodes, int cnt)
 {
+    if (nodes == NULL) {
+        return;
+    }
     for (int i = 0; i < cnt; ++i) {
         dealloc_node(*(nodes + i));
     }
