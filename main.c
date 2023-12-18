@@ -35,6 +35,86 @@ main() {
                 dealloc_nodes(nodes, len);
                 nodes = NULL;
                 if (scanf("%c", &state) != EOF) {
+        case 'a':
+            printf("%s", prompt_in);
+            dealloc_nodes(nodes, len);
+            nodes = NULL;
+            if (scanf("%c", &state) != EOF) {
+                scanf("%*c");
+                switch (state) {
+                case 'a':
+                    if ((len = read(stdin, &nodes, FILE_MODE)) == 0) {
+                        return 0;
+                    }
+                    break;
+                case 'b':
+                    file_name = readline(stdin, "Введите название файла\n");
+                    file = fopen(file_name, "r");
+                    free(file_name);
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
+                    if ((len = read(file, &nodes, FILE_MODE)) == 0) {
+                        return 0;
+                    }
+                    break;
+                case 'c':
+                    file_name = readline(stdin, "Введите название файла\n");
+                    file = fopen(file_name, "rb");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
+                    free(file_name);
+                    if ((len = read(file, &nodes, BIN_MODE)) == 0) {
+                        return 0;
+                    }
+                    break;
+                }
+            } else {
+                return 0;
+            }
+            break;
+        case 'b':
+            printf("%s", prompt_out);
+            if (scanf("%c", &state) != EOF) {
+                scanf("%*c");
+                switch (state) {
+                case 'a':
+                    write(stdout, nodes, len, FILE_MODE);
+                    break;
+                case 'b':
+                    file_name = readline(stdin, "Введите название файла\n");
+                    file = fopen(file_name, "w");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
+                    free(file_name);
+                    write(file, nodes, len, FILE_MODE);
+                    break;
+                case 'c':
+                    file_name = readline(stdin, "Введите название файла\n");
+                    file = fopen(file_name, "wb");
+                    if (file == NULL) {
+                        fprintf(stderr, "Ошибка файла\n");
+                        break;
+                    }
+                    free(file_name);
+                    write(file, nodes, len, BIN_MODE);
+                    break;
+                }
+            } else {
+                return 0;
+            }
+            break;
+        case 'c':
+            printf("%s", prompt_sort);
+            if (scanf("%c", &state) != EOF) {
+                scanf("%*c");
+                printf("%s", prompt_cmp);
+                if (scanf("%c", &state_2) != EOF) {
                     scanf("%*c");
                     switch (state) {
                         case 'a':
@@ -154,6 +234,34 @@ main() {
                                 } else {
                                     return 0;
                                 }
+<<<<<<< HEAD
+=======
+                                switch (state_3) {
+                                case 'a':
+                                    dir = DIRECT;
+                                    break;
+                                case 'b':
+                                    dir = REVERSE;
+                                    break;
+                                }
+                                switch (state) {
+                                case 'a':
+                                    sort = QSORT_MODE;
+                                    break;
+                                case 'b':
+                                    sort = GNOME_MODE;
+                                    break;
+                                case 'c':
+                                    sort = INSERTION_MODE;
+                                    break;
+                                }
+                                if (gen_arrays_nodes(&time, cnt, len, sort, cmp, dir) == 0) {
+                                    return 0;
+                                }
+                                cnt = 0;
+                                len = 0;
+                                printf("avg time: %f\n", time);
+>>>>>>> 4beebe7
                             } else {
                                 return 0;
                             }
