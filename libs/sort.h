@@ -5,8 +5,7 @@
 
 #include "struct.h"
 
-enum { DIRECT,
-    REVERSE };
+enum { DIRECT, REVERSE };
 
 typedef int (*fptr_compare)(Node* node_1, Node* node_2);
 

@@ -8,12 +8,7 @@
 #include "sort.h"
 #include "struct.h"
 
-enum { QSORT_MODE,
-    GNOME_MODE,
-    INSERTION_MODE,
-    NAME_MODE,
-    ID_MODE,
-    TIME_MODE };
+enum { QSORT_MODE, GNOME_MODE, INSERTION_MODE, NAME_MODE, ID_MODE, TIME_MODE };
 
 Node* gen_node(void);
 char* gen_name(void);

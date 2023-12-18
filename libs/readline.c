@@ -1,7 +1,7 @@
 #include "readline.h"
 
-char* readline(FILE* file, const char* prompt)
-{
+char*
+readline(FILE* file, const char* prompt) {
     fprintf(stdout, "%s", prompt);
     int size_inc = 10;
     int len = 0, cnt, max_len = size_inc + 1;

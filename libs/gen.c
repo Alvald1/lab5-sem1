@@ -1,64 +1,48 @@
 #include "gen.h"
 
-int measuring_time(Node** nodes, int len, float* time, int sort_mode, int cmp_mode, int direction_mode)
-{
+int
+measuring_time(Node** nodes, int len, float* time, int sort_mode, int cmp_mode, int direction_mode) {
     int direction = 0;
     clock_t start = 0, end = 0;
     fptr_compare compare = NULL;
     *time = 0;
     switch (cmp_mode) {
-    case NAME_MODE:
-        compare = cmp_name;
-        break;
-    case ID_MODE:
-        compare = cmp_id;
-        break;
-    case TIME_MODE:
-        compare = cmp_time;
-        break;
-    default:
-        dealloc_nodes(nodes, len);
-        return 0;
+        case NAME_MODE: compare = cmp_name; break;
+        case ID_MODE: compare = cmp_id; break;
+        case TIME_MODE: compare = cmp_time; break;
+        default: dealloc_nodes(nodes, len); return 0;
     }
     switch (direction_mode) {
-    case DIRECT:
-        direction = DIRECT;
-        break;
-    case REVERSE:
-        direction = REVERSE;
-        break;
-    default:
-        dealloc_nodes(nodes, len);
-        return 0;
+        case DIRECT: direction = DIRECT; break;
+        case REVERSE: direction = REVERSE; break;
+        default: dealloc_nodes(nodes, len); return 0;
     }
     switch (sort_mode) {
-    case QSORT_MODE:
-        start = clock();
-        _qsort(nodes, 0, len - 1, compare, direction);
-        end = clock();
-        *time += (float)(end - start) / CLOCKS_PER_SEC;
-        break;
-    case GNOME_MODE:
-        start = clock();
-        gnome_sort(nodes, len, compare, direction);
-        end = clock();
-        *time += (float)(end - start) / CLOCKS_PER_SEC;
-        break;
-    case INSERTION_MODE:
-        start = clock();
-        insertion_sort(nodes, len, compare, direction);
-        end = clock();
-        *time += (float)(end - start) / CLOCKS_PER_SEC;
-        break;
-    default:
-        dealloc_nodes(nodes, len);
-        return 0;
+        case QSORT_MODE:
+            start = clock();
+            _qsort(nodes, 0, len - 1, compare, direction);
+            end = clock();
+            *time += (float)(end - start) / CLOCKS_PER_SEC;
+            break;
+        case GNOME_MODE:
+            start = clock();
+            gnome_sort(nodes, len, compare, direction);
+            end = clock();
+            *time += (float)(end - start) / CLOCKS_PER_SEC;
+            break;
+        case INSERTION_MODE:
+            start = clock();
+            insertion_sort(nodes, len, compare, direction);
+            end = clock();
+            *time += (float)(end - start) / CLOCKS_PER_SEC;
+            break;
+        default: dealloc_nodes(nodes, len); return 0;
     }
     return 1;
 }
 
-int gen_arrays_nodes(float* time, int cnt, int len, int sort_mode, int cmp_mode, int direction_mode)
-{
+int
+gen_arrays_nodes(float* time, int cnt, int len, int sort_mode, int cmp_mode, int direction_mode) {
     FILE* file_save = NULL;
     const int size = 10;
     char* file_name = NULL;
@@ -88,8 +72,8 @@ int gen_arrays_nodes(float* time, int cnt, int len, int sort_mode, int cmp_mode,
     return 1;
 }
 
-int gen_nodes(Node*** nodes, int cnt)
-{
+int
+gen_nodes(Node*** nodes, int cnt) {
     void* tmp = malloc(cnt * sizeof(Node*));
     if (valid_alloc((void*)nodes, tmp, NULL, 1) == 0) {
         return 0;
@@ -106,8 +90,8 @@ int gen_nodes(Node*** nodes, int cnt)
     return 1;
 }
 
-Node* gen_node(void)
-{
+Node*
+gen_node(void) {
     void* tmp = malloc(sizeof(Node));
     Node* node = NULL;
     if (valid_alloc((void*)&node, tmp, node, 0) == 0) {
@@ -126,8 +110,8 @@ Node* gen_node(void)
     return node;
 }
 
-char* gen_name(void)
-{
+char*
+gen_name(void) {
     int len = rand() % 100;
     int size = 'a' - 'z';
     void* tmp = malloc(len + 1);
@@ -142,8 +126,8 @@ char* gen_name(void)
     return name;
 }
 
-char* gen_id(void)
-{
+char*
+gen_id(void) {
     int size_1 = 'a' - 'z', size_2 = 10;
     int len = 9;
     void* tmp = malloc(len + 1);

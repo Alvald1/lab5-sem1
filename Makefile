@@ -33,7 +33,7 @@ static: formating
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 formating:
-	clang-format *.c $(LIB_DIR)/*.c $(LIB_DIR)/*.h -i -style=webkit
+	clang-format *.c $(LIB_DIR)/*.c $(LIB_DIR)/*.h -i -style=file
 
 clean:
 	rm -rf $(EXECUTABLE)* *plist

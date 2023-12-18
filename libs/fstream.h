@@ -8,8 +8,7 @@
 #include "readline.h"
 #include "struct.h"
 
-enum { BIN_MODE,
-    FILE_MODE };
+enum { BIN_MODE, FILE_MODE };
 
 typedef Node* (*fptr_read_mode)(FILE* file);
 typedef void (*fptr_write_mode)(FILE* file, Node* node);

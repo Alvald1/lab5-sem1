@@ -1,7 +1,7 @@
 #include "fstream.h"
 
-int read(FILE* file, Node*** nodes, int mode)
-{
+int
+read(FILE* file, Node*** nodes, int mode) {
     int cnt = 0;
     fptr_read_mode read_mode = NULL;
     if (mode == BIN_MODE) {
@@ -33,8 +33,8 @@ int read(FILE* file, Node*** nodes, int mode)
     return cnt;
 }
 
-void write(FILE* file, Node** nodes, int cnt, int mode)
-{
+void
+write(FILE* file, Node** nodes, int cnt, int mode) {
     fptr_write_mode write_mode = NULL;
     if (mode == BIN_MODE) {
         fwrite(&cnt, sizeof(int), 1, file);
@@ -50,8 +50,8 @@ void write(FILE* file, Node** nodes, int cnt, int mode)
     }
 }
 
-Node* read_node_from_file(FILE* file)
-{
+Node*
+read_node_from_file(FILE* file) {
     Node* node = NULL;
     char *prompt_name = "", *prompt_id = "", *prompt_time = "";
     void* tmp = malloc(sizeof(Node));
@@ -95,8 +95,8 @@ Node* read_node_from_file(FILE* file)
     return node;
 }
 
-void write_node_to_file(FILE* file, Node* node)
-{
+void
+write_node_to_file(FILE* file, Node* node) {
     char *prompt_name = "", *prompt_id = "", *prompt_time = "";
     if (file == stdout) {
         prompt_name = "Name: ";
@@ -106,8 +106,8 @@ void write_node_to_file(FILE* file, Node* node)
     fprintf(file, "%s%s\n%s%s\n%s%d\n", prompt_name, node->name, prompt_id, node->id, prompt_time, node->time);
 }
 
-Node* read_node_from_bin(FILE* file)
-{
+Node*
+read_node_from_bin(FILE* file) {
     Node* node = NULL;
     int str_len = 0;
     void* tmp = malloc(sizeof(Node));
@@ -131,8 +131,8 @@ Node* read_node_from_bin(FILE* file)
     return node;
 }
 
-void write_node_to_bin(FILE* file, Node* node)
-{
+void
+write_node_to_bin(FILE* file, Node* node) {
     int str_len = strlen(node->name);
     fwrite(&str_len, sizeof(int), 1, file);
     fwrite(node->name, str_len + 1, 1, file);
@@ -142,8 +142,8 @@ void write_node_to_bin(FILE* file, Node* node)
     fwrite(&(node->time), sizeof(int), 1, file);
 }
 
-int valid_id(char* id)
-{
+int
+valid_id(char* id) {
     if (strlen(id) != 9) {
         return 0;
     }
@@ -161,8 +161,8 @@ int valid_id(char* id)
     return flag == 9;
 }
 
-int valid_alloc(void** original, void* tmp, Node* node, int mode)
-{
+int
+valid_alloc(void** original, void* tmp, Node* node, int mode) {
     if (tmp != NULL) {
         *original = tmp;
         return 1;

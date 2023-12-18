@@ -1,14 +1,14 @@
 #include "struct.h"
 
-void init_node(Node* node)
-{
+void
+init_node(Node* node) {
     node->name = NULL;
     node->id = NULL;
     node->time = 0;
 }
 
-void dealloc_nodes(Node** nodes, int cnt)
-{
+void
+dealloc_nodes(Node** nodes, int cnt) {
     if (nodes == NULL) {
         return;
     }
@@ -18,8 +18,8 @@ void dealloc_nodes(Node** nodes, int cnt)
     free(nodes);
 }
 
-void dealloc_node(Node* node)
-{
+void
+dealloc_node(Node* node) {
     if (node != NULL) {
         free(node->name);
         free(node->id);
